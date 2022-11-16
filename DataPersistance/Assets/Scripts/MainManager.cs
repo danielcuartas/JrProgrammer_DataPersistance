@@ -11,6 +11,7 @@ public class MainManager : MonoBehaviour
     public Rigidbody Ball;
 
     public Text ScoreText;
+    public Text hiScoreText;
     public GameObject GameOverText;
     
     private bool m_Started = false;
@@ -18,10 +19,18 @@ public class MainManager : MonoBehaviour
     
     private bool m_GameOver = false;
 
+
     
     // Start is called before the first frame update
     void Start()
     {
+        DataManager.Instance.LoadScore();
+        string hiScorePlayer = DataManager.Instance.dataHiScore.player;
+        int hiScore = DataManager.Instance.dataHiScore.score;
+        hiScoreText.text = "Best score: " + hiScorePlayer + ": " + hiScore;
+
+        ScoreText.text = DataManager.Instance.player + " Score : 0";
+
         const float step = 0.6f;
         int perLine = Mathf.FloorToInt(4.0f / step);
         
@@ -38,6 +47,8 @@ public class MainManager : MonoBehaviour
         }
     }
 
+    
+
     private void Update()
     {
         if (!m_Started)
@@ -51,6 +62,7 @@ public class MainManager : MonoBehaviour
 
                 Ball.transform.SetParent(null);
                 Ball.AddForce(forceDir * 2.0f, ForceMode.VelocityChange);
+                
             }
         }
         else if (m_GameOver)
@@ -65,12 +77,20 @@ public class MainManager : MonoBehaviour
     void AddPoint(int point)
     {
         m_Points += point;
-        ScoreText.text = $"Score : {m_Points}";
+        ScoreText.text = DataManager.Instance.player + $" Score : {m_Points}";
     }
 
     public void GameOver()
     {
         m_GameOver = true;
+        DataManager.Instance.score = m_Points;
+        DataManager.Instance.SaveScore();
+
+        DataManager.Instance.LoadScore();
+        string hiScorePlayer = DataManager.Instance.dataHiScore.player;
+        int hiScore = DataManager.Instance.dataHiScore.score;
+        hiScoreText.text = "Best score: " + hiScorePlayer + ": " + hiScore;
+
         GameOverText.SetActive(true);
     }
 }
